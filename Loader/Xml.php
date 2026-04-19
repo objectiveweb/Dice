@@ -4,15 +4,20 @@
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
  * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
  * @version 3.0 */
+
 namespace Dice\Loader;
-class Xml {
-	private function getComponent(\SimpleXmlElement $element, $forceInstance = false) {
+
+class Xml
+{
+	private function getComponent(\SimpleXmlElement $element, $forceInstance = false)
+	{
 		if ($forceInstance) return [\Dice\Dice::INSTANCE => (string) $element];
 		else if ($element->instance) return [\Dice\Dice::INSTANCE => (string) $element->instance];
 		else return (string) $element;
 	}
 
-	private function loadV1(\SimpleXmlElement $xml, \Dice\Dice $dice) {
+	private function loadV1(\SimpleXmlElement $xml, \Dice\Dice $dice)
+	{
 		$rules = [];
 
 		foreach ($xml as $key => $value) {
@@ -39,7 +44,8 @@ class Xml {
 		return $rules;
 	}
 
-	private function loadV2(\SimpleXmlElement $xml, \Dice\Dice $dice) {
+	private function loadV2(\SimpleXmlElement $xml, \Dice\Dice $dice)
+	{
 		$rules = [];
 
 		foreach ($xml as $key => $value) {
@@ -64,7 +70,8 @@ class Xml {
 		return $rules;
 	}
 
-	public function load($xml, \Dice\Dice $dice = null, $displayWarning = true) {
+	public function load($xml, \Dice\Dice $dice = null, $displayWarning = true)
+	{
 
 		if ($displayWarning) {
 			trigger_error('Deprecated: The XML loader is being removed in the next version of Dice please use $xmlLoader->convert(\'' . $xml . '\', \'path/to/rules.json\'); to convert the rules to JSON format', E_USER_WARNING);
@@ -79,7 +86,8 @@ class Xml {
 		else return $this->loadV1($xml, $dice);
 	}
 
-	public function convert($xml, $outputJson) {
+	public function convert($xml, $outputJson)
+	{
 		$rules = $this->load($xml);
 
 		file_put_contents($outputJson, json_encode($rules, JSON_PRETTY_PRINT));

@@ -1,17 +1,21 @@
 {
-    "name": "level-2/dice",
-    "description": "A minimalist Dependency injection container (DIC) for PHP. Please note: 3.0+ is only compatible with PHP 7.0. The 2.0 branch is compatbile with PHP 5.6.",
+    "name": "objectiveweb/dice",
+    "description": "A fork from the level-2/dice minimalist Dependency injection container (DIC) for PHP. This version only supports PHP 8+",
     "license": "BSD-2-Clause",
-    "homepage": "http://r.je/dice.html",
+    "homepage": "https://objectiveweb.github.io",
     "keywords": ["Dependency injection", "ioc", "Dependency injection container", "DI"],
     "authors": [
     	{
     		"name": "Tom Butler",
     		"email": "tom@r.je"
-    	}
+    	},
+	{
+		"name": "Guilherme Barile",
+		"email": "objectiveweb@bravado.com.br"
+	}
     ],
     "require": {
-        "php": ">=7.0.0"
+        "php": ">=8.0.0"
     },
     "autoload": {
     	"psr-4": {
