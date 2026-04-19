@@ -203,6 +203,64 @@ class Dice {
 		}
 		return false;
 	}
+
+	private function typeMatchesValue(\ReflectionType $type, $value)
+	{
+		if ($value === null) return $type->allowsNull();
+
+		if ($type instanceof \ReflectionNamedType) {
+			$name = $type->getName();
+			switch ($name) {
+				case 'int':
+					return is_int($value);
+				case 'float':
+					return is_float($value);
+				case 'string':
+					return is_string($value);
+				case 'bool':
+					return is_bool($value);
+				case 'array':
+					return is_array($value);
+				case 'callable':
+					return is_callable($value);
+				case 'iterable':
+					return is_iterable($value);
+				case 'object':
+					return is_object($value);
+				case 'mixed':
+					return true;
+				case 'null':
+					return $value === null;
+				case 'true':
+					return $value === true;
+				case 'false':
+					return $value === false;
+				default:
+					return  is_object($value) && $value instanceof $name;
+			}
+		}
+
+		if (method_exists($type, 'getTypes')) {
+			$types = call_user_func([$type, 'getTypes']);
+
+			// Union types accept any matching subtype.
+			if (strpos(get_class($type), 'Union') !== false) {
+				foreach ($types as $subType) {
+					if ($this->typeMatchesValue($subType, $value)) return true;
+				}
+				return false;
+			}
+
+			// Intersection types require all subtypes to match.
+			foreach ($types as $subType) {
+				if (!$this->typeMatchesValue($subType, $value)) return false;
+			}
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Returns a closure that generates arguments for $method based on $rule and any $args passed into the closure
 	 * @param object $method An instance of ReflectionMethod (see: {@link http:// php.net/manual/en/class.reflectionmethod.php})
@@ -249,12 +307,10 @@ class Dice {
 				}
 				catch (\InvalidArgumentException $e) {
 				}
-				// Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this is a hacky AF workaround: call_user_func('is_' . $type, '')
-
-				//Find a match in $args for scalar types
+				// Find a match in $args for any reflected type (named/union/intersection).
 				else if ($args && $param->getType()) {
 					for ($i = 0; $i < count($args); $i++) {
-						if (call_user_func('is_' . $param->getType()->getName(), $args[$i])) {
+						if ($this->typeMatchesValue($param->getType(), $args[$i])) {
 							$parameters[] = array_splice($args, $i, 1)[0];
                             break;
 						}
